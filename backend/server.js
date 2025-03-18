@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require('jsonwebtoken');
 const passport = require("passport");
 const session = require("express-session");
 require("dotenv").config();
@@ -60,7 +61,7 @@ const correctionRoutes = require("./routes/correctionRoutes"); // Maintenant dé
 
 // Configuration de la session avec MongoStore
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
@@ -69,33 +70,33 @@ app.use(session({
 
 // Route de connexion pour les enseignants avec vérification du mot de passe sécurisé
 // Dans server.js, modifier la route de connexion pour utiliser Passport
-app.post("/api/login/teacher", async (req, res) => {
-    const { email, password } = req.body;
+// app.post("/api/login/teacher", async (req, res) => {
+//     const { email, password } = req.body;
 
-    try {
-        console.log("Email reçu :", email); // Vérifie l'email reçu
-        const teacher = await User.findOne({ email, role: "teacher" });
+//     try {
+//         console.log("Email reçu :", email); // Vérifie l'email reçu
+//         const teacher = await User.findOne({ email, role: "teacher" });
 
-        if (!teacher) {
-            return res.status(404).json({ message: "Enseignant non trouvé" });
-        }
+//         if (!teacher) {
+//             return res.status(404).json({ message: "Enseignant non trouvé" });
+//         }
 
-        // Vérifie le mot de passe avec bcrypt
-        const isMatch = await bcrypt.compare(password, teacher.password);
+//         // Vérifie le mot de passe avec bcrypt
+//         const isMatch = await bcrypt.compare(password, teacher.password);
 
-        console.log("Mot de passe validé :", isMatch); // Vérifie si le mot de passe correspond
+//         console.log("Mot de passe validé :", isMatch); // Vérifie si le mot de passe correspond
 
-        if (!isMatch) {
-            return res.status(401).json({ message: "Mot de passe incorrect" });
-        }
+//         if (!isMatch) {
+//             return res.status(401).json({ message: "Mot de passe incorrect" });
+//         }
 
-        // Si tout va bien, retourne l'utilisateur enseignant
-        res.json(teacher);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Erreur du serveur" });
-    }
-});
+//         // Si tout va bien, retourne l'utilisateur enseignant
+//         res.json(teacher);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: "Erreur du serveur" });
+//     }
+// });
 
 // 🔐 Route de connexion pour enseignants avec JWT
 app.post("/api/login/teacher", async (req, res) => {
