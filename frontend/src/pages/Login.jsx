@@ -10,20 +10,20 @@ const Login = () => {
     const [loginError, setLoginError] = useState("");
 
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
-        
+        // Vérifie si l'utilisateur est déjà connecté en vérifiant le token dans localStorage
+        const token = localStorage.getItem("token");
         if (token) {
-            localStorage.setItem("token", token); // ✅ Correction : on stocke directement `token`
-            console.log("Token stocké : ", token);
-            navigate("/dashboard");
-        }
-        
+            navigate("/dashboard"); // Redirige vers le dashboard si un token est trouvé
+        } else {
+            // Vérifie le token dans l'URL (si l'utilisateur est redirigé après une connexion)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenFromUrl = urlParams.get("token");
 
-        // Si un utilisateur est déjà connecté, on le redirige vers le dashboard
-        const user = localStorage.getItem("user");
-        if (user) {
-            navigate("/dashboard");
+            if (tokenFromUrl) {
+                localStorage.setItem("token", tokenFromUrl); // Stocke le token si trouvé dans l'URL
+                console.log("Token stocké : ", tokenFromUrl);
+                navigate("/dashboard");
+            }
         }
     }, [navigate]);
 
@@ -57,7 +57,6 @@ const Login = () => {
                 console.error("❌ Erreur : aucun token reçu !");
             }
             
-    
             // Vérifie si le token a bien été stocké avant de rediriger
             const token = localStorage.getItem("token");
             if (token) {

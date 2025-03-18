@@ -57,9 +57,17 @@ const Dashboard = () => {
             ]);
 
             setStats(statsRes.data);
-            setSubmissions(submissionsRes.data);
+
+            // Vérifie que submissionsRes.data est un tableau
+            if (Array.isArray(submissionsRes.data)) {
+                setSubmissions(submissionsRes.data);
+            } else {
+                console.error("❌ Les soumissions ne sont pas sous forme de tableau :", submissionsRes.data);
+                setSubmissions([]); // Par défaut, un tableau vide si la réponse n'est pas valide
+            }
         } catch (error) {
             console.error("❌ Erreur lors du chargement des données :", error);
+            setSubmissions([]); // Assurez-vous de toujours définir submissions à un tableau
         }
     };
 
